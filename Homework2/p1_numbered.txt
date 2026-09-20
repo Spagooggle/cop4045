@@ -1,0 +1,65 @@
+1. # -*- coding: utf-8 -*-
+2. import ast
+3. 
+4. 
+5. def line_number(file_name: str, new_file_name: str) -> None:
+6.     try:
+7.         with open(file_name, "r", encoding="utf-8") as file:
+8.             lines = file.readlines()
+9. 
+10.         with open(new_file_name, "w", encoding="utf-8") as new_file:
+11.             for i, line in enumerate(lines, 1):
+12.                 new_file.write(f"{i}. {line}")
+13. 
+14.     except OSError as error:
+15.         print(f"There was a problem with the file: {error}")
+16.         raise
+17. 
+18. 
+19. def parse_functions(file_name: str) -> tuple:
+20.     try:
+21.         with open(file_name, "r", encoding="utf-8") as file:
+22.             code = file.read()
+23. 
+24.         tree = ast.parse(code)
+25.         functions = []
+26. 
+27.         for item in tree.body:
+28.             if isinstance(item, ast.FunctionDef):
+29.                 line_num = item.lineno
+30.                 function_name = item.name
+31.                 arguments = ast.unparse(item.args)
+32.                 function_code = ast.unparse(item)
+33. 
+34.                 functions.append(
+35.                     (
+36.                         line_num,
+37.                         function_name,
+38.                         arguments,
+39.                         function_code,
+40.                     )
+41.                 )
+42. 
+43.         functions.sort(key=lambda x: x[1])
+44. 
+45.         return tuple(functions)
+46. 
+47.     except (OSError, SyntaxError) as error:
+48.         print(f"There was a problem reading the Python file: {error}")
+49.         raise
+50. 
+51. 
+52. def main() -> None:
+53.     file_name = "p1_Fornaro_Brian.py"
+54.     new_file_name = "p1_numbered.txt"
+55. 
+56.     line_number(file_name, new_file_name)
+57. 
+58.     functions = parse_functions(file_name)
+59. 
+60.     print("Functions found:")
+61.     print(functions)
+62. 
+63. 
+64. if __name__ == "__main__":
+65.     main()
